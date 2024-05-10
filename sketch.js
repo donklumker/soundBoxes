@@ -1,11 +1,11 @@
-let d = 1;
+let d = 2;
 let i, j, n;
 
 let mic, fft;
 
-let band = 32;
+let band = 128;
 
-let unit = 5;
+let unit = 1;
 let count;
 let modA = [];
 
@@ -20,19 +20,23 @@ function setup() {
 
   modA = new Module(unit, unit);
 
-  let wideCount = band / 4;
-  let highCount = band / 4;
+  let wideCount = band / 16;
+  let highCount = band / 8;
   count = wideCount * highCount;
 
   let index = 0;
   for (let y = 0; y < highCount; y++) {
     for (let x = 0; x < wideCount; x++) {
-      modA[index++] = new Module(unit * x, unit * y, 4, 4, unit, y);
+      modA[index++] = new Module(unit * x, unit * y, 1, 1, unit, x * y);
     }
   }
 }
 function draw() {
-  background(255);
+  background(255, 129, 22);
+
+  // Turn on the lights.
+  ambientLight(228, 255, 255);
+  //directionalLight(128, 128, 128, 0, 0, -1);
 
   for (let i = 0; i < count; i++) {
     modA[i].updateDraw();
@@ -60,15 +64,16 @@ class Module {
 
   // Custom method for updating the variables
   updateDraw() {
+    noStroke();
     orbitControl();
     let spectrum = fft.analyze();
 
     for (i = 0; i < band; i++) {
-      this.zsz = map(spectrum[this.band], 0, 2000, 0, height);
-      this.lrp = lerp(0, this.zsz, 0.1);
+      this.zsz = map(spectrum[this.band], 0, 200, 0, height);
+      this.lrp = lerp(0, this.zsz, 0.05);
 
       push();
-      fill(100 + this.lrp, 0, 255 - this.lrp);
+      fill(155 + this.lrp, 0, 255 - this.lrp);
 
       translate(this.xOff, this.yOff, this.lrp / 2);
       box(this.xsz, this.ysz, this.lrp);
